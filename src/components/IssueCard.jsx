@@ -73,6 +73,9 @@ export default function IssueCard({issue, openSubtasks, isMatch, searchQuery, st
   const relationNodes = linkedRelations.map((li, idx) => {
     const jiraUrl = `https://riscv.atlassian.net/browse/${encodeURIComponent(li.key || "")}`;
     const relText = String(li.relationship || "").trim();
+    const summaryText = String(li.summary || "").trim();
+    const keyText = String(li.key || "").trim();
+    const linkLabel = summaryText || keyText || "";
     return h(
       "span",
       {className: "meta-muted", key: `${li.key || ""}-${li.relationship || ""}`},
@@ -81,8 +84,9 @@ export default function IssueCard({issue, openSubtasks, isMatch, searchQuery, st
       h(
         "a",
         {className: "approval-link", href: jiraUrl, target: "_blank", rel: "noopener noreferrer"},
-        li.summary || li.key || ""
-      )
+        linkLabel
+      ),
+      summaryText && keyText ? ` (${keyText})` : ""
     );
   });
   const mailto = buildMailto(issue, issuePhase, taskCounts, taskOnly, isaDisplay, ftDisplayClean, ghUrl);
