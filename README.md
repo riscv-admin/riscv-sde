@@ -39,7 +39,7 @@ The container listens on port `5038`.
 The app attempts to load YAML from:
 1) `VITE_YAML_URL` (if provided)
 2) `DEFAULT_SRC_REMOTE` (GitHub release URL placeholder in `src/config/constants.js`)
-3) Local file `public/RVS_phase_rollup.yaml` (mounted into the container)
+3) Local file `public/RVS_phase_rollup.yaml` (mounted into the container, not tracked in git)
 
 Update the placeholder URL in `src/config/constants.js` to your release URL.
 
@@ -102,6 +102,6 @@ This repo is configured to deploy to GitHub Pages on every push to `main` and on
 
 ## YAML Release Workflow
 
-`Release YAML` runs hourly and on manual dispatch. It executes `scripts/run_get_issues.sh` (in single-run mode) and uploads `public/RVS_phase_rollup.yaml` to a timestamped GitHub release.
+`Release YAML` runs hourly and on manual dispatch. It executes `scripts/run_get_issues.sh` (in single-run mode) and uploads `RVS_phase_rollup.yaml` as a timestamped GitHub release asset (the canonical source).
 
-The workflow expects `get-issues.py` to exist in the repo root; if the generator lives elsewhere, update `scripts/run_get_issues.sh` or the workflow to point at it.
+The workflow expects `scripts/get-issues.py`; if the generator lives elsewhere, update `scripts/run_get_issues.sh` or the workflow to point at it.

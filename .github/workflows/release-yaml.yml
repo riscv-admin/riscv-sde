@@ -36,12 +36,9 @@ jobs:
           JIRA_SERVER_URL: ${{ secrets.JIRA_SERVER_URL }}
         run: bash scripts/run_get_issues.sh
 
-      - name: Normalize YAML path
+      - name: Verify YAML exists
         run: |
-          if [[ -f RVS_phase_rollup.yaml && ! -f public/RVS_phase_rollup.yaml ]]; then
-            mv RVS_phase_rollup.yaml public/RVS_phase_rollup.yaml
-          fi
-          if [[ ! -f public/RVS_phase_rollup.yaml ]]; then
+          if [[ ! -f RVS_phase_rollup.yaml ]]; then
             echo "RVS_phase_rollup.yaml not found"
             exit 1
           fi
@@ -58,5 +55,5 @@ jobs:
         with:
           tag_name: ${{ steps.meta.outputs.tag }}
           name: ${{ steps.meta.outputs.name }}
-          files: public/RVS_phase_rollup.yaml
+          files: RVS_phase_rollup.yaml
           generate_release_notes: false
