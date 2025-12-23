@@ -486,11 +486,13 @@ def enrich_linked_issues(jira: JIRA, issues: List[SimpleNamespace]) -> None:
         for link in links:
             link_type = link.get("type") or {}
             if link.get("outwardIssue"):
-                linked_key = (link.get("outwardIssue") or {}).get("key")
+                outward = link.get("outwardIssue") or {}
+                linked_key = outward.get("key")
                 relationship = link_type.get("outward")
                 direction = "outward"
             elif link.get("inwardIssue"):
-                linked_key = (link.get("inwardIssue") or {}).get("key")
+                inward = link.get("inwardIssue") or {}
+                linked_key = inward.get("key")
                 relationship = link_type.get("inward")
                 direction = "inward"
             else:
@@ -498,10 +500,12 @@ def enrich_linked_issues(jira: JIRA, issues: List[SimpleNamespace]) -> None:
 
             if not linked_key:
                 continue
+            issue_fields = (outward if direction == "outward" else inward).get("fields") or {}
+            linked_summary = issue_fields.get("summary")
             collected.append(
                 {
                     "key": linked_key,
-                    "summary": None,
+                    "summary": linked_summary,
                     "relationship": relationship,
                     "direction": direction,
                     "url": f"{server}/browse/{linked_key}",
@@ -514,7 +518,8 @@ def enrich_linked_issues(jira: JIRA, issues: List[SimpleNamespace]) -> None:
     summary_map = _fetch_issue_summaries(jira, sorted(set(linked_keys)))
     for issue in issues:
         for link in issue._linked_issues or []:
-            link["summary"] = summary_map.get(link["key"])
+            if not link.get("summary"):
+                link["summary"] = summary_map.get(link["key"])
 
 
 # -------- Formatting / Output --------
