@@ -23,6 +23,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
 
+      - name: Fetch latest YAML release asset
+        run: |
+          mkdir -p public
+          if ! curl -fL -o public/RVS_phase_rollup.yaml "https://github.com/riscv-admin/riscv-sde/releases/latest/download/RVS_phase_rollup.yaml"; then
+            echo "No release YAML available; continuing without it."
+          fi
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:

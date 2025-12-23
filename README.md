@@ -38,8 +38,8 @@ The container listens on port `5038`.
 
 The app attempts to load YAML from:
 1) `VITE_YAML_URL` (if provided)
-2) `DEFAULT_SRC_REMOTE` (GitHub release URL placeholder in `src/config/constants.js`)
-3) Local file `public/RVS_phase_rollup.yaml` (mounted into the container, not tracked in git)
+2) Local file `public/RVS_phase_rollup.yaml` (mounted into the container, not tracked in git)
+3) `DEFAULT_SRC_REMOTE` (GitHub release URL placeholder in `src/config/constants.js`)
 
 Update the placeholder URL in `src/config/constants.js` to your release URL.
 
@@ -99,6 +99,8 @@ The UI is bundled with Vite and served as static assets by Nginx. The page is `i
 ## GitHub Pages
 
 This repo is configured to deploy to GitHub Pages on every push to `main` and on every YAML release. The Vite build sets `base` to `/riscv-sde/` when `GITHUB_PAGES=true`.
+
+To avoid browser CORS issues with GitHub release assets, the Pages workflow downloads the latest release YAML and places it in `public/` before building so the app can load `RVS_phase_rollup.yaml` from the same origin.
 
 ## YAML Release Workflow
 

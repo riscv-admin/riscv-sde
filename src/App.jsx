@@ -38,7 +38,7 @@ export default function App(){
   const toastTimerRef = useRef(null);
 
   const fetchYaml = useCallback(async () => {
-    const sources = [ENV_YAML_URL, DEFAULT_SRC_REMOTE, DEFAULT_SRC_LOCAL].filter(Boolean);
+    const sources = [ENV_YAML_URL, DEFAULT_SRC_LOCAL, DEFAULT_SRC_REMOTE].filter(Boolean);
     let lastErr = null;
     for(const src of sources){
       try{
