@@ -38,6 +38,7 @@ export default function App(){
   const lastGenRef = useRef(null);
   const lastGeneratedRef = useRef(null);
   const toastTimerRef = useRef(null);
+  const initialPhaseRef = useRef(null);
 
   const fetchYaml = useCallback(async () => {
     const sources = [ENV_YAML_URL, DEFAULT_SRC_LOCAL, DEFAULT_SRC_REMOTE].filter(Boolean);
@@ -98,6 +99,23 @@ export default function App(){
     }
   }, [fetchYaml]);
 
+  // Parse URL hash (#Freeze) or query param (?expand=Freeze) to auto-expand a phase on load.
+  useEffect(() => {
+    const findPhase = (name) => {
+      if(!name) return null;
+      const lower = name.toLowerCase().replace(/^#/, "");
+      return PHASE_ORDER.find(p => p.toLowerCase() === lower) || null;
+    };
+    const params = new URLSearchParams(window.location.search);
+    const expandParam = params.get("expand");
+    const hash = window.location.hash.replace(/^#/, "");
+    const target = findPhase(expandParam) || findPhase(hash);
+    if(target){
+      setExpandedPhase(target);
+      initialPhaseRef.current = target;
+    }
+  }, []);
+
   useEffect(() => {
     const t = setInterval(() => setNowTick(Date.now()), 60000);
     return () => clearInterval(t);
@@ -127,6 +145,14 @@ export default function App(){
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
   }, []);
+
+  // Scroll to the initially targeted phase once data is available.
+  useEffect(() => {
+    if(!data || !initialPhaseRef.current) return;
+    const phase = initialPhaseRef.current;
+    initialPhaseRef.current = null;
+    requestAnimationFrame(() => scrollToPhase(phase));
+  }, [data]);
 
   useEffect(() => {
     fetch("status_config.json")
@@ -354,9 +380,11 @@ export default function App(){
               {
                 key: phase,
                 onClick: () => {
+                  const next = isActive ? null : phase;
                   setExpandPhases(false);
-                  setExpandedPhase(isActive && expandedPhase === phase ? null : phase);
+                  setExpandedPhase(next);
                   scrollToPhase(phase);
+                  history.replaceState(null, "", next ? `#${phase}` : window.location.pathname + window.location.search);
                 },
                 className: `chip phase-chip ${isActive ? "is-active" : ""}`
               },
